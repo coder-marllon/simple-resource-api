@@ -1,5 +1,9 @@
 # SIMPLE RESOURCE API
 
+## Sobre
+**Stack**: Python + Django + DRF
+**Escopo**: Uma API para catálogos de produtos.
+
 ## Requisitos Essenciais (Timebox 4h)
 
 1. Modelos: Em api/models.py, defina:
