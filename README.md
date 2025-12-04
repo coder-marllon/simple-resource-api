@@ -1,59 +1,133 @@
-* IMPORTANTE: Não inicie este desafio sem autorização. O desafio só poderá ser iniciado no dia e horário agendado via Google Meet. Entre em contato via email ou whatsapp:
-  - administrativo@infinixassessoria.com.br
-  - (21) 99515-2411
-
-# SIMPLE RESOURCE API
-
-## Sobre
-**Stack**: Python + Django + DRF
-**Escopo**: Uma API para catálogos de produtos.
-
-## Requisitos Essenciais (Timebox 4h)
-
-1. Modelos: Em api/models.py, defina:
-    - Category(name: CharField)
-    - Product(name: Charfield, description: TextField, price: DecimalField (2 decimal places), category: ForeignKey(Category, on_delete=models.PROTECT))
-2. Admin: Registre ambos os modelos *Category* e *Product* no api/admin.py para que sejam gerenciáveis via Django Admin.
-3. API (DRF):
-    - Defina *serializers* para *Category* e *Product*.
-    - O serializador de *Product* deve exibir o nome da categoria, não apenas seu ID.
-    - Use **ViewSets** para fornercer funcionalidade CRUD completa para *Category* e *Product*.
-    - Configure urls usando DefaultRouter do DRF para registrar os ViewSets.
-4. Testes: Escreva pelo menos 2 (dois) testes unitários usando APITestCase do DRF:
-    - Um teste para verificar a criação de um Produto.
-    - Um teste para verificar a listagem de Produtos.
-
-#### Bônus (Desejáveis):
-    - Swagger (Documentação API: Configure e adicione as rotas ao urls.py principal.
-    - AWS S3 (Upload de Arquivos): Adicione um campo ImageField(upload_to='products/') ao modelo Product; Configue django-storages e boto3 e dê instruções sobre como configurar as credenciais da AWS para testar o upload.
-    - Hospedagem: Forneça um Dockerfile e docker-compose.yml que permitam rodar o projeto e seu banco de dados (PostgersSQL) com um único comando. Se preferir, faça deploy no Render.
-
-# Rubrica de Avaliação
-
-| Dimensão Avaliada                        | Peso  | Pontuação (1-5) | Descrição da Avaliação (O que procurar)                                                                                                                                                                                                 |
-|------------------------------------------|-------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **1. Funcionalidade (Requisitos Essenciais)** | 40%  | [1-5]           | **5 (Excelente):** Cumpriu 100% dos requisitos essenciais. A aplicação roda de primeira, sem bugs óbvios. Trata estados de loading/error.<br>**3 (Satisfatório):** Cumpriu a maioria (80%+) dos requisitos. Funcionalidade principal funciona, mas com bugs menores.<br>**1 (Inaceitável):** Não roda ou a funcionalidade principal está quebrada. O avaliador não consegue testar a solução. |
-| **2. Qualidade de Código e Estrutura**       | 25%  | [1-5]           | **5 (Excelente):** Código limpo, legível e idiomático. Segue princípios (ex: DRY). Estrutura de pastas lógica e escalável. Separação clara de responsabilidades.<br>**3 (Satisfatório):** Código funciona, mas com repetição ou "code smells". Estrutura de pastas aceitável, mas confusa.<br>**1 (Inaceitável):** "Código espaguete". Variáveis ruins. "Sopa de arquivos" na raiz. |
-| **3. Processo e Comunicação (Git & README)** | 25%  | [1-5]           | **5 (Excelente):** Commits atômicos, frequentes e bem descritos. PR bem escrito. README completo com setup e explicações de design.<br>**3 (Satisfatório):** Usa Git, mas commits grandes (ex: "implementa home e função de agendar tarefas e remove var desnecessária"). README mínimo com instruções básicas.<br>**1 (Inaceitável):** Um único commit ("final"). Nenhum README ou instruções. Demonstra falta de profissionalismo e comunicação. |
-| **4. Bônus e Resolução de Problemas**        | 10%  | [1-5]           | **5 (Excelente):** Implementou requisitos bônus funcionando. README explica como utilizar.<br>**3 (Satisfatório):** Tentou implementar bônus, mas não funcionou. README explica falha e plano.<br>**1 (Inaceitável):** Ignorou bônus ou implementou com falhas e sem explicação no README. |
-
 ## Instruções sobre "README-CANDIDATO" (Timebox 30min):
 Preencha este arquivo com informações claras e concisas, separadas pelas seguintes seções:
 
 #### Seção 1: Instruções para rodar
+
 - Quais variáveis de ambiente são necessárias?
+
+# .env (opcional para desenvolvimento)
+DEBUG=True
+SECRET_KEY=sua-chave-secreta-aqui
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+Observação: O projeto foi configurado para rodar com valores padrão, então as variáveis de ambiente são opcionais para desenvolvimento local. Em produção, recomendo configurar SECRET_KEY e DEBUG=False.
+
 - Como instalar dependências?
+
+Opção A: Com Docker (recomendado):
+
+# Todas as dependências estão no Dockerfile
+docker-compose build
+
+Opção B: Manualmente (sem Docker):
+
+# Crie e ative ambiente virtual
+python -m venv venv
+
+# Linux/Mac:
+source venv/bin/activate
+
+# Windows:
+venv\Scripts\activate
+
+# Instale dependências
+pip install -r requirements.txt
+
 - Como rodar o projeto?
 
+Com Docker Compose (método principal):
+
+# 1. Suba os containers
+docker-compose up -d
+
+# 2. Execute as migrações (se não rodar automaticamente)
+docker-compose exec web python manage.py migrate
+
+# 3. Crie um superusuário (opcional, para acessar o admin)
+docker-compose exec web python manage.py createsuperuser
+
+# 4. Acesse a aplicação:
+#    - API: http://localhost:8000/api/
+#    - Admin: http://localhost:8000/admin/
+#    - Swagger: http://localhost:8000/api/docs/
+
+# 5. Para parar:
+docker-compose down
+
+Sem Docker:
+
+# 1. Execute migrações
+python manage.py migrate
+
+# 2. Execute o servidor
+python manage.py runserver
+
+# 3. Acesse: http://localhost:8000
+
+
 #### Seção 2: Decisões de design
+
 - Qual foi a maior dificuldade que você encontrou e como superou?
+
+A maior dificuldade foi implementar o bônus de upload de imagens para o S3 AWS dentro do timebox de 4 horas. Embora tenha conseguido adicionar o campo ImageField ao modelo Product, a configuração completa com AWS S3 apresentou vários desafios.
+Aprendizado principal: A integração com serviços externos como AWS requer não apenas código, mas também documentação clara e configuração de ambiente robusta. Decidi focar em fazer uma implementação que funcione localmente enquanto mantém a estrutura pronta para produção.
+
 - O que você não teve tempo de fazer (dentro do timebox) e como você faria se tivesse mais tempo?
 
+Com mais tempo, tentaria inclementar umas Melhorias na API, como:
+
+Paginação otimizada com cursor-based pagination para grandes conjuntos de dados;
+Filtros avançados usando django-filter para busca por intervalo de preço, categoria, etc;
+Cache com Redis para endpoints frequentemente acessados;
+Rate limiting para prevenir abuso da API.
+
 #### Seção 3: Link para Deploy (Bônus)
+
 - Cole aqui o link do projeto hospedado ou instrua como rodar via Docker.
+
+https://github.com/coder-marllon/simple-resource-api.git
+
+
+Como rodar via Docker :
+
+Método 1: Com Docker Compose
+
+# 1. Clone o repositório
+git clone https://github.com/coder-marllon/simple-resource-api.git
+cd simple-resource-api
+
+# 2. Construa e execute os containers
+docker-compose up --build
+
+# 3. Ou para rodar em segundo plano:
+docker-compose up -d --build
+
+# 4. Acesse a aplicação em:
+#    - API e Swagger: http://localhost:8000/api/docs/
+#    - Admin Django: http://localhost:8000/admin/
+
+Apenas Docker (sem docker-compose)
+
+# 1. Construa a imagem
+docker build -t simple-resource-api .
+
+# 2. Execute o container
+docker run -p 8000:8000 \
+  -v $(pwd)/db.sqlite3:/app/db.sqlite3 \
+  -v $(pwd)/media:/app/media \
+  -e DEBUG=1 \
+  simple-resource-api
+
+# 3. Execute migrações (em outro terminal)
+docker exec -it <container_id> python manage.py migrate
 
 #### Seção final: Recomendações
 - Escreva aqui dicas, melhorias e recomendações sobre este desafio.
 
-## Considerações finais:
-Este desafio não foi pensado para encontrar quem o finaliza 100% ou quem o termina mais rápido. Estamos buscando um desenvolvedor sério, que saiba como desenvolver soluções mesmo que para apenas 50% do projeto. Não queremos nenhum dev que dependa 100% de IA ou de terceiros, mas sim aquele que sabe priorizar, desenvolver e pesquisar.
+Algumas melhorias que pensei foram :
+
+Adicionar paginação nas listagens da API;
+
+Implementar filtros por categoria, preço e nome.
+
+Porém, achei o desafio muito bom da maneira que está. Desde já quero agradecer a oportunidade.
