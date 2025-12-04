@@ -7,8 +7,8 @@ class CategorySerializer(serializers.ModelSerializer):
     model = Category
     fields = '__all__'
     
-class ProductSerializer(serializers.MoodelSerializer):
-  category_name = serializers.Charfield(source='category_name', read_only=True)
+class ProductSerializer(serializers.ModelSerializer):
+  category_name = serializers.CharField(source='category_name', read_only=True)
   
   class Meta:
     model = Product
