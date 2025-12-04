@@ -1,5 +1,3 @@
-Um README melhor estruturado para esse desafio pode ficar assim:
-
 ***
 
 # Simple Resource API
